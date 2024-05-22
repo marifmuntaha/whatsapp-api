@@ -1,4 +1,5 @@
 // Port number
+const { Browsers } = require('@whiskeysockets/baileys')
 const PORT = process.env.PORT || '3333'
 const TOKEN = process.env.TOKEN || ''
 const PROTECT_ROUTES = !!(
@@ -64,11 +65,7 @@ module.exports = {
             useUnifiedTopology: true,
         },
     },
-    browser: {
-        platform: CLIENT_PLATFORM,
-        browser: CLIENT_BROWSER,
-        version: CLIENT_VERSION,
-    },
+    browser: Browsers.macOS('Desktop'),
     webhookEnabled: WEBHOOK_ENABLED,
     webhookUrl: WEBHOOK_URL,
     webhookBase64: WEBHOOK_BASE64,

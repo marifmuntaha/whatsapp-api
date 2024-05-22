@@ -3,7 +3,7 @@ const QRCode = require('qrcode')
 const pino = require('pino')
 const {
     default: makeWASocket,
-    DisconnectReason,
+    DisconnectReason, fetchLatestBaileysVersion,
 } = require('@whiskeysockets/baileys')
 const { unlinkSync } = require('fs')
 const { v4: uuidv4 } = require('uuid')
@@ -72,9 +72,11 @@ class WhatsAppInstance {
     async init() {
         this.collection = mongoClient.db('whatsapp-api').collection(this.key)
         const { state, saveCreds } = await useMongoDBAuthState(this.collection)
+        const { version, isLatest } = await fetchLatestBaileysVersion()
         this.authState = { state: state, saveCreds: saveCreds }
         this.socketConfig.auth = this.authState.state
-        this.socketConfig.browser = Object.values(config.browser)
+        this.socketConfig.browser = config.browser
+        this.socketConfig.version = version
         this.instance.sock = makeWASocket(this.socketConfig)
         this.setHandler()
         return this
@@ -87,6 +89,7 @@ class WhatsAppInstance {
 
         // on socket closed, opened, connecting
         sock?.ev.on('connection.update', async (update) => {
+            console.log(update)
             const { connection, lastDisconnect, qr } = update
 
             if (connection === 'connecting') return
